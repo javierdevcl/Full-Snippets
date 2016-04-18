@@ -1,0 +1,9 @@
+Icons
+
+'menu_icon'			  => 'dashicons-testimonial',
+'menu_icon'			  => 'dashicons-admin-home',
+'menu_icon'			  => 'dashicons-format-image',
+'menu_icon'			  => 'dashicons-editor-help',
+
+'icon'  => 'el el-file',
+'icon'       => 'el el-quote-right',

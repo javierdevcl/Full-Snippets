@@ -1,0 +1,2 @@
+<a href="<?php echo get_permalink(get_adjacent_post(false,'',true)); ?>" class="sprite_sp product_prev"></a>
+<a href="<?php echo get_permalink(get_adjacent_post(false,'',false)); ?>" class="sprite_sp product_next"></a>	

@@ -1,0 +1,23 @@
+//functions.php
+// embed the javascript file that makes the AJAX request
+wp_enqueue_script( 'my-ajax-request', THEME . '/js/ajax.js', array( 'jquery' ) );
+ 
+// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
+wp_localize_script( 'my-ajax-request', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+
+add_action( 'wp_ajax_nopriv_get_post_content', 'get_post_content' );
+add_action( 'wp_ajax_get_post_content', 'get_post_content' );
+
+function get_post_content() {
+    if(!empty($_POST['postID'])) {
+        $post_id = isset($_POST['postID']) ? sanitize_text_field($_POST['postID']) : '';
+        $post_obj = get_post($post_id);
+        ob_start();
+        ?>
+        <div class="blah"><?php echo $post_obj->post_content;?></div>
+        <?php
+        $result = ob_get_clean();
+        echo json_encode($result);
+    }
+    die();
+}
