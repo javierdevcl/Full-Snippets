@@ -95,13 +95,7 @@ GOOGLE MAPS MULTIPLE ADDRESSES
 
 <?php get_header();?>
 
-<div class="container">
-	<?php while(have_posts()) : the_post(); ?>
-		<div class="content clearfix">
-			<div id="map-canvas"></div>
-		</div>
-	<?php endwhile;?>
-</div>
+<div id="map_canvas" data-marker="<?php the_field('map_marker', 'option');?>"></div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
@@ -110,9 +104,9 @@ GOOGLE MAPS MULTIPLE ADDRESSES
 				<?php while ( have_rows('map_repeater') ) : the_row();?> 
 			         <?php 
 			         	$full_address = get_sub_field('address');
-			            $address = $full_address['address'];                     //[i][0]
-			            $lat   = $full_address['lat'];                           //[i][1]
-			            $lng   = $full_address['lng'];                           //[i][2]
+			            $address 	= $full_address['address'];   	//[i][0]
+			            $lat   		= $full_address['lat'];     	//[i][1]
+			            $lng   		= $full_address['lng']; 		//[i][2]
 			         ?>     
 					[
 						<?php if($address) echo "'".$address."'"; else echo '';?>,
@@ -126,37 +120,37 @@ GOOGLE MAPS MULTIPLE ADDRESSES
 </script>
 
 <script>
-	jQuery(document).ready(function() {
-	    var map = new google.maps.Map(document.getElementById('map-canvas'), {
-	        zoom: 9,
-	        scrollwheel: false,
-	        zoomControl: false,
-	        disableDefaultUI: false,
-	        draggable: false,
-	        streetViewControl: false,
-	        panControl: false,
-	        center: new google.maps.LatLng(locations[0][1], locations[0][2]),
-	        mapTypeId: google.maps.MapTypeId.ROADMAP
-	    });
+	function multimarker_map() {
+		var map = new google.maps.Map(document.getElementById('map_canvas'), {
+			zoom: 9,
+			scrollwheel: false,
+			zoomControl: false,
+			disableDefaultUI: false,
+			draggable: false,
+			streetViewControl: false,
+			panControl: false,
+			center: new google.maps.LatLng(locations[0][1], locations[0][2]),
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		});
 
-	    var infowindow = new google.maps.InfoWindow();
-	    var marker, i;
+		var infowindow = new google.maps.InfoWindow();
+		var marker, i;
 
-	    for (i = 0; i < locations.length; i++) {  
-	      	marker = new google.maps.Marker({
-		        position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-		        map: map,
-		        icon: locations[i][7]
-	   		});
+		for (i = 0; i < locations.length; i++) {  
+			marker = new google.maps.Marker({
+				position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+				map: map,
+				icon: jQuery('#map_canvas').data('marker')
+			});
 
-	      	google.maps.event.addListener(marker, 'click', (function(marker, i) {
-	        	return function() {
-					infowindow.setContent('<div id="info_window">'+locations[i][0]+'</div>');
+			google.maps.event.addListener(marker, 'click', (function(marker, i) {
+				return function() {
+					infowindow.setContent('<div class="info_window">'+locations[i][0]+'</div>');
 					infowindow.open(map, marker);
-	    		}  
-	    	})(marker, i));
+				}  
+			})(marker, i));
 		}
-	});
+	}
 </script>
 
 <?php get_footer(); ?>
@@ -213,3 +207,63 @@ define ('LANG', ICL_LANGUAGE_CODE);
 if(LANG == 'he') $maplang = '&language=iw'; else $maplang = '';
 
 wp_enqueue_script( 'googlemaps', 'https://maps.googleapis.com/maps/api/js?v=3.exp&language='.$maplang, array(), NULL, true );
+
+
+
+
+
+
+
+map filter 
+
+function region_filter() {
+    var infowindow = new google.maps.InfoWindow();
+
+    jQuery('#region_filter').on('change', function() {
+        // ClearMarkers
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+
+        selected_region = jQuery(this).val();
+        for (i = 0; i < locations.length; i++) {
+            if(selected_region == locations[i][3]) {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    map: map,
+                    icon: jQuery('#map_canvas').data('icon')
+                });
+
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infowindow.setContent('<div class="info_window">'+locations[i][0]+'</div>');
+                        infowindow.open(map, marker);
+                    }  
+                })(marker, i));
+
+                markers.push(marker);
+
+                map.setCenter(marker.getPosition());
+
+            }
+        }
+    });
+}
+
+<div class="filter">
+	<h5 class="caption"><?php the_field('before_map_caption');?></h5>
+		<?php 
+		$regions = array();
+		while(have_rows('map_repeater')) : the_row();
+			if(!in_array(get_sub_field('region'), $regions)) {
+				$regions[] = get_sub_field('region');
+			}
+		endwhile;
+		?>
+	<select name="region_filter" id="region_filter">
+		<?php foreach ($regions as $region): ?>
+			<option value="<?php echo $region;?>"><?php echo $region;?></option> 
+		<?php endforeach ?>
+	</select>
+</div>
+<div id="map_canvas" data-icon="<?php the_field('map_marker', 'option');?>"></div>

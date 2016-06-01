@@ -6,7 +6,7 @@ PAGE WITH LINK
 PAGE THAT _GET's URL
 
 <?php 
-	$lesson_id = isset($_GET['lessonID']) ? $_GET['lessonID'] : '';
+	$lesson_id = isset($_GET['lessonID']) ? intval($_GET['lessonID']) : '';
 	if($lesson_id) 
 		lesson_number = get_field('lesson_number',$lesson_id);
 ?>

@@ -1,0 +1,1 @@
+<?php echo force_balance_tags(html_entity_decode(wp_trim_words(htmlentities($text), 60)));?>

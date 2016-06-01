@@ -24,8 +24,8 @@ jQuery(".various").fancybox({
 	closeEffect	: 'none'
 });
 
-<a class="various fancybox.iframe" href="http://www.youtube.com/embed/<?php the_field('youtube_id');?>?autoplay=1">
-	<img class="youtube_img" src="http://img.youtube.com/vi/<?php the_field('youtube_id');?>/hqdefault.jpg">
+<a class="various fancybox.iframe" href="https://www.youtube.com/embed/<?php the_field('youtube_id');?>?autoplay=1">
+	<img class="youtube_img" src="https://img.youtube.com/vi/<?php the_field('youtube_id');?>/hqdefault.jpg">
 </a>
 
 
@@ -48,3 +48,38 @@ jQuery('.fancybox').fancybox({
 		}
 	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sub gallery
+
+<div class="row">
+	<?php while ( have_posts() ) : the_post(); ?>
+		<?php $images = get_field('gallery');?>
+		<div class="col-md-4 col-sm-6">
+			<div class="gallery_wrap gallery_<?php echo $post->ID;?>">
+				<a href="<?php echo $images[0]['sizes']['large'];?>" class="fancybox" rel="gallery_<?php echo $post->ID;?>">
+					<div class="image_wrap">
+						<?php post_thumb('sec_1_post');?>
+					</div>
+					<h2><?php the_title();?></h2>
+				</a>
+			</div>
+		</div>
+
+		<?php foreach ($images as $key => $image) : if ($key != 0) : ?>
+			<a class="fancybox" href="<?php echo $image['sizes']['large'];?>" rel="gallery_<?php echo $post->ID;?>"></a>
+		<?php endif; endforeach;
+	endwhile;?>
+</div>

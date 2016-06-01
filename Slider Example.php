@@ -7,6 +7,16 @@ function slider_init() {
         autoplaySpeed: 3000,
         autoplay: true,
         adaptiveHeight: false,
+		responsive : [
+            {
+                breakpoint:800,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1, 
+
+                }
+            },
+        ]
     });
 
     jQuery('.slider_wrapper .next_slide').click(function() {

@@ -1,5 +1,3 @@
-<?php if(get_field('cf_id')) echo do_shortcode('[contact-form-7 id="'.get_field('cf_id').'"]');?>
-
 <div class="contact_form clearfix">
 	<div class="input_wrap">[text* name placeholder "Name *"]</div>
 	<div class="input_wrap">[text* family_name placeholder "Family Name *"]</div>
@@ -71,6 +69,18 @@ span.wpcf7-not-valid-tip {
 }
 
 
+.wpcf7 ::-webkit-input-placeholder {
+    color:#00135d;
+}
+.wpcf7 :-moz-placeholder {
+    color:#00135d;
+}
+.wpcf7 ::-moz-placeholder {
+    color:#00135d;
+}
+.wpcf7 :-ms-input-placeholder {
+    color:#00135d;
+}
 
 
 
@@ -92,92 +102,8 @@ span.wpcf7-not-valid-tip {
 }
 
 
-
-.wpcf7 ::-webkit-input-placeholder {
-    color:#00135d;
-}
-.wpcf7 :-moz-placeholder {
-    color:#00135d;
-}
-.wpcf7 ::-moz-placeholder {
-    color:#00135d;
-}
-.wpcf7 :-ms-input-placeholder {
-    color:#00135d;
-}
-
-
-
-
-
-
-
-on_sent_ok: "document.location='/thanks/';"
-
-function toyota_campaing_conversion(){
-    google_conversion();
-    facebook_conversion();
-}
-
-function google_conversion(){
-    var google_conversion_id = 983415949;
-    var google_conversion_language = "en";
-    var google_conversion_format = "3";
-    var google_conversion_color = "ffffff";
-    var google_conversion_label = "b8LvCPeC3mEQjfn21AM";
-    var google_remarketing_only = false;
-
-    jQuery.getScript("//www.googleadservices.com/pagead/conversion.js");
-}
-function facebook_conversion(){
-    (function() {
-      var _fbq = window._fbq || (window._fbq = []);
-      if (!_fbq.loaded) {
-        var fbds = document.createElement('script');
-        fbds.async = true;
-        fbds.src = '//connect.facebook.net/en_US/fbds.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(fbds, s);
-        _fbq.loaded = true;
-      }
-    })();
-
-    window._fbq = window._fbq || [];
-    window._fbq.push(['track', '6044328182873', {'value':'0.00','currency':'ILS'}]);
-}
-
-
-
-
-<div class="contact_property clearfix">
-	<span class="contact-title">Please fill your details and we will contact you soon!</span>
-	<div class="contact-col first-col">
-		<h2 class="col-title">Details About the Property</h2>
-		<div class="field clearfix"><label>Place of Property</label><div class="input_wrapper">[select place include_blank "Tel Aviv" "Ramat Gan"]</div></div>
-		<div class="field clearfix"><label>Type of Property</label><div class="input_wrapper">[select type include_blank "House" "Apartment"]</div></div>
-		<div class="field clearfix"><label>Address</label><div class="input_wrapper">[text address]</div></div>
-		<div class="field clearfix"><label>Sq Ft</label><div class="input_wrapper">[number sq_ft]</div></div>
-		<div class="field clearfix"><label>Sq Ft 2</label><div class="input_wrapper">[number sq_ft_2]</div></div>
-		<div class="field clearfix"><label>Age of Property</label><div class="input_wrapper">[number age]</div></div>
-		<div class="field clearfix"><label>Number of Rooms</label><div class="input_wrapper">[number rooms]</div></div>
-		<div class="field clearfix"><label>Number of Bedrooms</label><div class="input_wrapper">[number bedrooms]</div></div>
-		<div class="field field-50 clearfix"><label>Floor</label><div class="input_wrapper">[number floor]</div></div>
-		<div class="field field-50 clearfix"><label>Out of</label><div class="input_wrapper">[number out_of]</div></div>
-		<div class="field clearfix"><label>Number of Porches</label><div class="input_wrapper">[number porch]</div></div>
-		<div class="field clearfix"><label>Porches Sq Ft</label><div class="input_wrapper">[number porch_sq_ft]</div></div>
-		<div class="field clearfix"><label>Comments</label><div class="input_wrapper">[textarea comments]</div></div>
-	</div>
-	<div class="contact-col">
-		<h2 class="col-title">Details About the Owner</h2>
-		<div class="field clearfix"><label>First Name</label><div class="input_wrapper">[text* name]</div></div>
-		<div class="field clearfix"><label>Family Name</label><div class="input_wrapper">[text family]</div></div>
-		<div class="field clearfix"><label>Email Address</label><div class="input_wrapper">[email* email]</div></div>
-		<div class="field clearfix"><label>Phone Number</label><div class="input_wrapper">[tel* phone]</div></div>
-		<div class="field updates clearfix">[checkbox updates "Email me about updates"]</div>
-		<div class="submit_wrapper">[submit class:cform_send "Send"]</div>
-	</div>
-</div>
-
+STYLE CHECKBOX
+---------------
 
 <div class="approve_wrapper"><div class="approve_img"></div>[checkbox approve id:approve "I would like to receive updates about projects and real estate sales"]</div>
 
@@ -193,3 +119,59 @@ function checkbox_cf7() {
         }
     });
 }
+
+
+
+DB TO WPCF7
+-----------
+
+functions.php
+wpcf7_add_shortcode('postdropdown', 'createbox', true);
+
+function createbox() {
+    global $post;
+    $args = array( 'post_type'=> 'suite' );
+    $myposts = get_posts( $args );
+    $output = "<select name=suite value=suite><option value=notchosen>בחר חדר</option>";
+    foreach ( $myposts as $post ) : setup_postdata($post);
+        $title = get_the_title();
+        $output .= "<option value='$title'> $title </option>";
+
+        endforeach;
+    $output .= "</select>";
+    return $output;
+}
+
+contact form 7 form
+Write [postdropdown] shortcode where you want the field to appear.
+
+contact form mail
+סוויטה: [suite] (the option value)
+
+
+INSERT MESSAGE TO DB
+--------------------
+
+add_action( 'wpcf7_before_send_mail', 'insert_testimonial' );
+
+function insert_testimonial( $cf7 ) {
+    $author             = isset($_POST["full_name"]) ? sanitize_text_field( $_POST["full_name"] ) : '';
+    $post_title         = isset($_POST["post_title"]) ? sanitize_text_field( $_POST["post_title"] ) : '';
+    $post_content       = isset($_POST["post_content"]) ? sanitize_text_field( $_POST["post_content"] ) : '';
+    $date_of_holiday    = isset($_POST["date_of_holiday"]) ? sanitize_text_field( $_POST["date_of_holiday"] ) : '';
+    $comments           = isset($_POST["comments"]) ? sanitize_text_field( $_POST["comments"] ) : '';
+
+    wp_insert_post( array(
+        'post_type' => 'testimonial',
+        'post_title' => $post_title,
+        'post_content' => $post_content,
+        'post_status' => 'pending',
+        'meta_input' => array(
+                'author' => $author,
+                'date_of_holiday' => $date_of_holiday,
+                'comments' => $comments
+            )
+        )
+    );
+}
+
